@@ -20,8 +20,17 @@ const test = document.getElementById("test") as HTMLParagraphElement
 type Response = z.infer<typeof ResponseSchema> | null;
 
 const renderData = (data:Response) =>{
-    test.innerHTML = data!.name ? "Rick Sanchez"  : data!.name
+    test.innerHTML = data!.name
     console.log(data!.name)
+
+}
+
+let nameArray: string[] = []
+const listedNames = (data:Response) =>{
+  for (let index = 0; index < data!.name.length; index++) {
+     nameArray = [...nameArray, data!.name];
+    
+  }
 
 }
 
@@ -33,7 +42,10 @@ const getData = async (apiURL: string): Promise<Response | null> => {
     console.error;
     return null;
   }
+  listedNames(data)
   renderData(data)
+  console.log(nameArray)
+  console.log(data!.name)
   return data;
 };
 
