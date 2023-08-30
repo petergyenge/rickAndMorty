@@ -13,26 +13,10 @@ const ResponseSchema = z.object({
       gender: z.string(),
       image: z.string(),
     }
-);
-
-const test = document.getElementById("test") as HTMLParagraphElement
+).array();
 
 type Response = z.infer<typeof ResponseSchema> | null;
 
-const renderData = (data:Response) =>{
-    test.innerHTML = data!.name
-    console.log(data!.name)
-
-}
-
-let nameArray: string[] = []
-const listedNames = (data:Response) =>{
-  for (let index = 0; index < data!.name.length; index++) {
-     nameArray = [...nameArray, data!.name];
-    
-  }
-
-}
 
 const getData = async (apiURL: string): Promise<Response | null> => {
   const response = await http.get(apiURL);
@@ -40,15 +24,13 @@ const getData = async (apiURL: string): Promise<Response | null> => {
   const result = ResponseSchema.safeParse(data);
   if (!result.success) {
     console.error;
+    console.log("null")
     return null;
   }
-  listedNames(data)
-  renderData(data)
-  console.log(nameArray)
-  console.log(data!.name)
+  console.log("data")
+  console.log(result)
   return data;
 };
 
 getData(apiUrl)
 
-console.log()
