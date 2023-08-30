@@ -1,8 +1,8 @@
 import "./style.css";
-import http from "axios";
+import http /* ,{AxiosError, AxiosResponse} */ from "axios";
 import { z } from "zod";
 
-const apiUrl = "https://rickandmortyapi.com/api/character"
+ const apiURL = "https://rickandmortyapi.com/api/character/"
 
 const ResponseSchema = z.object({
       id: z.number(),
@@ -13,9 +13,24 @@ const ResponseSchema = z.object({
       gender: z.string(),
       image: z.string(),
     }
-).array();
+)
+ 
+
+/* const ResponseSchema = z.object({
+  date: z.string(),
+  explanation: z.string(),
+  url: z.string(),
+  title: z.string(),
+});
+
+
+const apiURL = `https://api.nasa.gov/planetary/apod?api_key=agJ4RiUMnTdtLXjD89PG084vSK89goRLAd971PKd`;
+ */
 
 type Response = z.infer<typeof ResponseSchema> | null;
+const name = document.getElementById("test") as HTMLParagraphElement
+const randomImg = document.getElementById("randomImg") as HTMLImageElement
+
 
 
 const getData = async (apiURL: string): Promise<Response | null> => {
@@ -24,13 +39,26 @@ const getData = async (apiURL: string): Promise<Response | null> => {
   const result = ResponseSchema.safeParse(data);
   if (!result.success) {
     console.error;
-    console.log("null")
+    console.log(result)
     return null;
   }
-  console.log("data")
-  console.log(result)
+  const render = () =>{
+    name.innerHTML = data.name
+    randomImg.src = data.image
+  }
+  render()
   return data;
 };
+getData(apiURL)
 
-getData(apiUrl)
+
+document.getElementById("mathRandom")!.addEventListener("click", () =>{
+  function randomIntFromInterval(min: number, max: number) { // min and max included 
+    return Math.floor(Math.random() * (max - min + 1) + min)
+  }
+ let randomNumber =  randomIntFromInterval(0, 200)
+ console.log(randomNumber)
+ getData(apiURL + randomNumber)
+
+})
 
