@@ -6,11 +6,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Rick And Morty</title>
   </head>
-  <body class="bg-slate-500">
-    <div id="app">
-      <p id="test"></p>
-      <img src="" alt="" id="randomImg" >
-      <button id="mathRandom">Click me</button>
+  <body class="bg-slate-500 p-10">
+    <div id="app" class="flex">
+      <div class="card w-96 bg-base-100 shadow-xl m-3">
+        <figure class="px-10 pt-10">
+          <img src="" id="image" class="rounded-xl" />
+        </figure>
+        <div class="card-body items-center text-center">
+          <p id="name" class="p-2  text-lg"></p>
+          <p id="status" class="p-2  text-lg"></p>
+          <p id="species" class="p-2  text-lg"></p>
+          <p id="gender" class="p-2  text-lg"></p>
+          <div class="felx flex-col">
+            <button id="mathRandom" class="btn btn-xs sm:btn-sm md:btn-md lg:btn-lg m-5">next</button>
+            <button class="btn btn-xs sm:btn-sm md:btn-md lg:btn-lg m-5" id="likeButton">Like
+             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+            </button>
+            <input type="text" id="nameInput" placeholder="Írd be a neved" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+          </div>
+        </div>
+      </div>
+
+
+      <div class="card w-96 bg-base-100 shadow-xl m-3">
+          <div id="friss">
+      </div>
     </div>
     <script type="module" src="/src/main.ts"></script>
   </body>

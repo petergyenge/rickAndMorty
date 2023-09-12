@@ -1,77 +1,82 @@
-import express from "express"
-import type { Request, Response } from "express"
-import cors from "cors"
-import fs from "fs/promises"
-import { z } from "zod"
+import express from "express";
+import type { Request, Response } from "express";
+import cors from "cors";
+import fs from "fs";
+import { z } from "zod";
 
-const server = express()
+const server = express();
+server.use(cors());
+server.use(express.json());
 
-server.use(cors())
+const ResponseSchema = z.object({
+  results: z
+    .object({
+      id: z.number(),
+      name: z.string(),
+      status: z.string(),
+      species: z.string(),
+      gender: z.string(),
+      image: z.string(),
+    })
+    .array(),
+});
 
-type User = {
-  id: number
-  name: string
-  age: number
-}
+server.get("/api/character", async (req: Request, res: Response) => {
+  const characterData = await JSON.parse(
+    fs.readFileSync("database/character.json", "utf-8")
+  );
+  return res.json(characterData);
+});
 
-const parse = (data: string): User[] => data
-    .split("\n")
-    .filter(row => !!row)
-    .map(row => ({
-      id: +row.split(",")[0],
-      name: row.split(",")[1],
-      age: +row.split(",")[2],
-    }))
 
-const stringify = (data: User[]): string => data
-    .map(user => `${user.id},${user.name},${user.age}`)
-    .join("\n")
+server.get("/api/refresh", async (req: Request, res: Response) => {
+  const characterData = await JSON.parse(
+    fs.readFileSync("database/liked.json", "utf-8")
+  );
+  return res.json(characterData);
+});
 
-const QuerySchema = z.object({
-  name: z.string(),
-})
 
-// REST API - GET (method) /api/users (path) -> array
-// GET /api/users?name=John   /api/users?age=30&name=John  -> array
-server.get("/api/users", async (req: Request, res: Response) => {
+const characterSchema = z.object({
+  userName: z.string().optional(),
+  characterName: z.string(),
+});
 
-  const userData = await fs.readFile("./database/users.txt", "utf-8")
-  const users = parse(userData)
+let id = 1
+server.post("/api/liked", (req: Request, res: Response) => {
+  const result = characterSchema.safeParse(req.body);
 
-  const result = QuerySchema.safeParse(req.query)
-  if (!result.success)
-    return res.json(users)
+  if (!result.success) return res.status(400).json(result.error.issues);
+  const fileData = JSON.parse(fs.readFileSync("database/liked.json", "utf-8"));
 
-  const query = result.data
-  let filteredUsers = users.filter(user => user.name.includes(query.name))
 
-  res.json(filteredUsers)
-})
+  fileData.push({id: id++, characterName: result.data.characterName, userName: result.data.userName});
 
-// GET /api/users/15 (id!!!!) path variable -> 1 object
-server.get("/api/users/:id", async (req: Request, res: Response) => {
+  fs.writeFileSync("database/liked.json",JSON.stringify(fileData, null, 2),"utf-8");
+});
+
+
+const deletecharacterSchema = z.object({
+  id: z.number(),
+  userName: z.string(),
+  characterName: z.string(),
+}).array();
+
+server.delete("/api/del/:id", async (req: Request, res: Response) => {
+
   const id = +req.params.id
+  const fileData = JSON.parse(fs.readFileSync("database/liked.json", "utf-8"))
+  const result = deletecharacterSchema.safeParse(fileData)
 
-  const userData = await fs.readFile("./database/users.txt", "utf-8")
-  const users = parse(userData)
-  let filteredUser = users.find(user => user.id === id)
+  if (!result.success) return res.status(400).json(result.error.issues);
 
-  if (!filteredUser)
-    return res.sendStatus(404)
+  const likedChar = result.data
+  let filteredLiked = likedChar.filter(charId => charId.id !== id)
 
-  res.json(filteredUser)
-})
-
-server.delete("/api/users/:id", async (req: Request, res: Response) => {
-  const id = +req.params.id
-
-  const userData = await fs.readFile("./database/users.txt", "utf-8")
-  const users = parse(userData)
-  let filteredUsers = users.filter(user => user.id !== id)
-
-  await fs.writeFile("./database/users.txt", stringify(filteredUsers), "utf-8")
+  fs.writeFileSync("database/liked.json",JSON.stringify(filteredLiked, null, 2),"utf-8");
 
   res.sendStatus(200)
 })
 
-server.listen(3333)
+
+server.listen(3333);
