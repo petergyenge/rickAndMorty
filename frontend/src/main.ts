@@ -25,7 +25,7 @@ const characterSchema = z.object({
 }).array();
  
 type Response = z.infer<typeof ResponseSchema> | null;
-type Responsecharacter = z.infer<typeof characterSchema> | null;
+type Responsecharacter = z.infer<typeof characterSchema>;
 
 const name = document.getElementById("name") as HTMLParagraphElement
 const species = document.getElementById("species") as HTMLParagraphElement
@@ -56,6 +56,11 @@ const renderLikedCharaters = (data: Responsecharacter) =>{
           <h2 class="card-title p-2">${charname.characterName}</h2>
           <button type="button" class="btn btn-xs" id="${charname.id}">delete</button>
         </div>`).join("")}`
+
+  for(const character of data){
+    document.getElementById( "" +character.id)?.addEventListener("click", deleteCaracter)
+  }
+    
 }
 
 const getCharacter = async (apiURLCharacter: string) => {
@@ -117,10 +122,10 @@ const addLiked = () => {
 
 likeButton.addEventListener('click', addLiked)
 
-/* document.getElementById(`${}`)
 
-const deleteCaracter = async (id:number) => {
 
-  const response = await axios.delete(`http://localhost:3333/api/del/${id}`)
+const deleteCaracter = async (event: MouseEvent) => {
+  refresCharacter(apiURLResfresh)
+  const response = await axios.delete(`http://localhost:3333/api/del/${(event.target as HTMLButtonElement).id}`)
   response
-} */
+}
